@@ -1,16 +1,19 @@
-import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
-from app.router import read, create, update, delete
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory='app/static'), name="static")
-app.include_router(read.router)
-app.include_router(create.router)
-app.include_router(update.router)
-app.include_router(delete.router)
+# app.include_router(read.router)
+
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+
+    return templates.TemplateResponse("index.html",
+                                      {"request": request})
 
 
 
