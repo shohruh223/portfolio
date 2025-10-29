@@ -1,22 +1,16 @@
-# from sqlalchemy import (create_engine, Column, Integer, String,
-#                         and_, NUMERIC, or_)
-# from sqlalchemy.orm import declarative_base, sessionmaker
-#
-# engine = create_engine("postgresql://postgres:1@localhost:5432/postgres",
-#                        echo=True)
-# Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-# db = Session()
-# Base = declarative_base()
-#
-#
-# class User(Base):
-#     __tablename__ = "user"
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     image = Column(String)
-#     fullname = Column(String, nullable=False)
-#     job = Column(String)
-#     about = Column(String)
-#
-#
-#
-# Base.metadata.create_all(engine)
+# app/model.py
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite:////home/PortfolioMe/portfolio/data.db"
+
+# SQLite bo'lsa, connect_args kerak bo'ladi
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=connect_args)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+Base = declarative_base()
+
+# ⚠️ MUHIM: BU YERDAN create_all() ni olib tashlang!
+# Base.metadata.create_all(engine)  # <-- O'CHIRING

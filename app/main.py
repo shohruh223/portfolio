@@ -6,7 +6,6 @@ from starlette.staticfiles import StaticFiles
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory='app/static'), name="static")
-# app.include_router(read.router)
 
 
 @app.get("/", response_class=HTMLResponse)
