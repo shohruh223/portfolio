@@ -64,6 +64,13 @@ async def create_contact(request: Request):
     return RedirectResponse("/?message=success#contact", status_code=303)
 
 
+# --- Webhook endpoint (hech qanday secret tekshiruvi yo‘q) ---
+@app.post("/webhook")
+async def telegram_webhook(request: Request):
+    data = await request.json()
+    await dp.feed_raw_update(bot, data)
+    return JSONResponse({"ok": True})
+
 
 # --- FastAPI ishga tushganda webhookni o‘rnatish ---
 @app.on_event("startup")
