@@ -83,7 +83,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.spyderproject
+.spyderprojectkoyeb
 .spyproject
 .ropeproject
 /site

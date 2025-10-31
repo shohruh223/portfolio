@@ -1,23 +1,28 @@
-from fastapi import FastAPI, Request, status
-from fastapi.responses import HTMLResponse
+# app/main.py
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse, JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
-from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
-from starlette.status import HTTP_302_FOUND
-from app.bot import bot, TELEGRAM_CHAT_ID, lifespan
+from environs import Env
+
+from app.bot import bot, dp, setup_webhook  # aiogramdan import
 from app.database import get_db
 from app.model import Contact
 
-app = FastAPI(lifespan=lifespan)
+env = Env()
+env.read_env()
+
+TELEGRAM_CHAT_ID = env.int("TELEGRAM_CHAT_ID", 0)
+
+app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
-app.mount("/static", StaticFiles(directory='app/static'), name="static")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    message = request.query_params.get("message", None)
-    return templates.TemplateResponse("index.html",
-                                      {"request": request, "message":message})
+    message = request.query_params.get("message")
+    return templates.TemplateResponse("index.html", {"request": request, "message": message})
 
 
 @app.post("/contact")
@@ -36,20 +41,38 @@ async def create_contact(request: Request):
     db.add(contact)
     db.commit()
 
-    # Telegramga yuboriladigan xabar
-    text = (
-        "<b>Yangi kontakt xabari</b>\n"
-        f"📱 <b>Phone:</b> {phone_number}\n"
-        f"🤖 <b>Telegram:</b><a href='https://t.me/{phone_number}'> {phone_number}</a>\n"
-        f"✉️ <b>Email:</b> {gmail}\n"
-        f"🧾 <b>Subject:</b> {subject}\n"
-        f"📝 <b>Message:</b>\n{message}"
-    )
+    # (ixtiyoriy) Telegramga xabar yuborish
+    if TELEGRAM_CHAT_ID:
+        text = (
+            "<b>Yangi kontakt xabari</b>\n"
+            f"📱 <b>Phone:</b> {phone_number}\n"
+            f"🤖 <b>Telegram:</b><a href='https://t.me/{phone_number}'> {phone_number}</a>\n"
+            f"✉️ <b>Email:</b> {gmail}\n"
+            f"🧾 <b>Subject:</b> {subject}\n"
+            f"📝 <b>Message:</b>\n{message}\n"
+        )
+        try:
+            await bot.send_message(
+                chat_id=TELEGRAM_CHAT_ID,
+                text=text,
+                parse_mode="HTML",
+                disable_web_page_preview=True
+            )
+        except Exception:
+            pass
 
-    await bot.send_message(chat_id=TELEGRAM_CHAT_ID,
-                           text=text,
-                           parse_mode="HTML",
-                           disable_web_page_preview=True)
+    return RedirectResponse("/?message=success#contact", status_code=303)
 
 
-    return RedirectResponse("/?message=success#contact", status_code=status.HTTP_303_SEE_OTHER)
+# --- Webhook endpoint (hech qanday secret tekshiruvi yo‘q) ---
+@app.post("/webhook")
+async def telegram_webhook(request: Request):
+    data = await request.json()
+    await dp.feed_raw_update(bot, data)
+    return JSONResponse({"ok": True})
+
+
+# --- FastAPI ishga tushganda webhookni o‘rnatish ---
+@app.on_event("startup")
+async def on_startup():
+    await setup_webhook()
