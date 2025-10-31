@@ -1,16 +1,17 @@
-# # app/model.py
-# import os
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker, declarative_base
-#
-# DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite:////home/PortfolioMe/portfolio/data.db"
-#
-# # SQLite bo'lsa, connect_args kerak bo'ladi
-# connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-#
-# engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=connect_args)
-# SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
-# Base = declarative_base()
-#
-# # ⚠️ MUHIM: BU YERDAN create_all() ni olib tashlang!
-# # Base.metadata.create_all(engine)  # <-- O'CHIRING
+from sqlalchemy import (Column, Integer, String, ForeignKey, Numeric,
+                        CheckConstraint, Text)
+from sqlalchemy.orm import relationship
+from .database import Base, engine
+
+
+class Contact(Base):
+    __tablename__ = "contacts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    phone_number = Column(String(20), nullable=False)
+    gmail = Column(String(100), nullable=False)
+    subject = Column(String(255))
+    message = Column(Text)
+
+
+Base.metadata.create_all(bind=engine)

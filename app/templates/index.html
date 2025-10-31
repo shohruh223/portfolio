@@ -627,10 +627,11 @@
 
                     <div class="info-wrap">
                         <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
-                            <i class="bi bi-geo-alt flex-shrink-0"></i>
+                            <a href="https://t.me/shohruh_abdurahmon" target="_blank" class="google-plus"><i
+                                    class="bi bi-telegram"></i></a>
                             <div>
-                                <h3>Address</h3>
-                                <p>Tashkent</p>
+                                <h3>Telegram</h3>
+                                <a href="https://t.me/shohruh_abdurahmon" target="_blank"><p>@shohruh_abdurahmon</p></a>
                             </div>
                         </div>
 
@@ -651,24 +652,24 @@
                         </div>
 
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1927.615215944329!2d69.24114531723723!3d41.32415079483035!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38ae8b8582251c2d%3A0x1c2ee4f256515150!2sPDP%20Junior!5e0!3m2!1sen!2s!4v1761660924483!5m2!1sen!2s"
-                                width="400" height="350" style="border:0;" allowfullscreen="" loading="lazy"
+                                width="380" height="300" style="border:0;" allowfullscreen="" loading="lazy"
                                 referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                 </div>
 
                 <div class="col-lg-7">
-                    <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up"
-                          data-aos-delay="200">
+                    <form action="/contact" method="post">
                         <div class="row gy-4">
 
                             <div class="col-md-6">
-                                <label for="name-field" class="pb-2">Your Name</label>
-                                <input type="text" name="name" id="name-field" class="form-control" required="">
+                                <label for="name-field" class="pb-2">Phone number</label>
+                                <input type="tel" name="phone_number" pattern="^\+998\s?\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$"
+                                       placeholder="+998 90 123 45 67" id="name-field" class="form-control" required="">
                             </div>
 
                             <div class="col-md-6">
-                                <label for="email-field" class="pb-2">Your Email</label>
-                                <input type="email" class="form-control" name="email" id="email-field" required="">
+                                <label for="email-field" class="pb-2">Email</label>
+                                <input type="email" class="form-control" name="gmail" id="email-field">
                             </div>
 
                             <div class="col-md-12">
@@ -683,11 +684,13 @@
                             </div>
 
                             <div class="col-md-12 text-center">
-                                <div class="loading">Loading</div>
-                                <div class="error-message"></div>
-                                <div class="sent-message">Your message has been sent. Thank you!</div>
+                                {% if message == "success" %}
+                                    <p style="color: green;">Xabaringiz yuborildi ✅</p>
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+                                    <i class="bi bi-send"></i> Send Message
+                                </button>
 
-                                <button type="submit">Send Message</button>
                             </div>
 
                         </div>
