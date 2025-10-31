@@ -64,15 +64,38 @@ async def create_contact(request: Request):
     return RedirectResponse("/?message=success#contact", status_code=303)
 
 
-# --- Webhook endpoint (hech qanday secret tekshiruvi yo‘q) ---
-@app.post("/webhook")
-async def telegram_webhook(request: Request):
-    data = await request.json()
-    await dp.feed_raw_update(bot, data)
-    return JSONResponse({"ok": True})
-
 
 # --- FastAPI ishga tushganda webhookni o‘rnatish ---
 @app.on_event("startup")
 async def on_startup():
     await setup_webhook()
+
+
+# # app/main.py (qo'shimcha diagnostika endpointlari)
+# from fastapi import HTTPException
+# from aiogram.methods.get_webhook_info import GetWebhookInfo
+#
+# @app.get("/_webhook_info", response_class=JSONResponse)
+# async def webhook_info():
+#     try:
+#         info = await bot(GetWebhookInfo())
+#         return info.model_dump()
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+#
+# @app.post("/_set_webhook")
+# async def force_set_webhook():
+#     try:
+#         await setup_webhook()
+#         return JSONResponse({"ok": True, "message": "Webhook set via setup_webhook()"})
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+#
+# @app.post("/_delete_webhook")
+# async def delete_webhook():
+#     try:
+#         # Webhookni tozalash
+#         await bot.delete_webhook(drop_pending_updates=True)
+#         return JSONResponse({"ok": True, "message": "Webhook deleted"})
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))

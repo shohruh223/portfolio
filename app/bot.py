@@ -1,4 +1,4 @@
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, Router
 from aiogram.filters import Command
 from environs import Env
 
@@ -10,6 +10,14 @@ WEBHOOK_URL = env.str("WEBHOOK_URL")  # masalan: https://yourapp.koyeb.app/webho
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 dp = Dispatcher()
+
+
+router = Router()
+
+
+@router.message(Command('start'))
+async def cmd_start(message: types.Message):
+    await message.answer("bot ishladi")
 
 
 async def setup_webhook():
